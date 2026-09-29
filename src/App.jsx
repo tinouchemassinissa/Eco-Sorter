@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { Heart, Trophy, RefreshCcw, Pause, Play, Home, Flame, Clock, Volume2, VolumeX } from 'lucide-react';
+import { Heart, Trophy, RefreshCcw, Pause, Play, Home, Flame, Clock, Volume2, VolumeX, Globe } from 'lucide-react';
 import { playPop, playBuzzer, playTap, playPowerUp } from './sound';
 import { playBackgroundMusic, stopBackgroundMusic } from './music';
+import { submitScore, getLeaderboard } from './firebase';
 
 const TRASH_DICTIONARY = [
   // ♻️ RECYCLE (27 items)
@@ -215,7 +216,11 @@ const T = {
     newHigh: '🎉 New High Score! 🎉',
     playAgain: 'Play Again',
     lvl: 'Lvl',
-    combo: 'Combo'
+    combo: 'Combo',
+    leaderboardBtn: 'Global Leaderboard',
+    leaderboardTitle: '🏆 Global Leaders',
+    loading: 'Loading scores...',
+    noScores: 'No scores yet! Be the first!'
   },
   fr: {
     heroMode: "MODE HÉROS ACTIVÉ !",
@@ -244,7 +249,11 @@ const T = {
     newHigh: '🎉 Nouveau Record ! 🎉',
     playAgain: 'Rejouer',
     lvl: 'Niv',
-    combo: 'Combo'
+    combo: 'Combo',
+    leaderboardBtn: 'Classement Mondial',
+    leaderboardTitle: '🏆 Meilleurs Joueurs',
+    loading: 'Chargement...',
+    noScores: 'Aucun score ! Soyez le premier !'
   }
 };
 
@@ -305,6 +314,8 @@ function App() {
   const [ecoFact, setEcoFact] = useState(null);
   const [difficulty, setDifficulty] = useState('Normal');
   const [lang, setLang] = useState('en');
+  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
   
   const currentLevel = Math.floor(score / 200) + 1;
 
@@ -443,6 +454,17 @@ function App() {
       localStorage.setItem('ecoSorterHighScoreName', playerName.trim());
       confetti({ particleCount: 200, spread: 120, origin: { y: 0.4 } });
     }
+    if (score > 0) {
+      submitScore(playerName.trim() || 'Hero', score);
+    }
+  };
+
+  const openLeaderboard = async () => {
+    setGameState('leaderboard');
+    setIsLoadingLeaderboard(true);
+    const data = await getLeaderboard();
+    setLeaderboardData(data);
+    setIsLoadingLeaderboard(false);
   };
 
   const triggerShake = () => {
@@ -713,9 +735,14 @@ function App() {
             <button className="btn-primary" onClick={startGame} disabled={!playerName.trim()}>
               <Play size={24}/> {T[lang].playNow}
             </button>
-            <button className="btn-primary btn-secondary" style={{marginTop: '1rem', background: '#3b82f6', borderBottomColor: '#2563eb'}} onClick={() => setGameState('about')}>
-              {T[lang].aboutBtn}
-            </button>
+            <div style={{display: 'flex', gap: '10px', marginTop: '1rem', width: '100%'}}>
+              <button className="btn-primary btn-secondary" style={{flex: 1, background: '#3b82f6', borderBottomColor: '#2563eb', padding: '8px 10px', fontSize: '0.9rem'}} onClick={() => setGameState('about')}>
+                {T[lang].aboutBtn}
+              </button>
+              <button className="btn-primary" style={{flex: 1, background: '#8b5cf6', borderBottomColor: '#6d28d9', padding: '8px 10px', fontSize: '0.9rem'}} onClick={openLeaderboard}>
+                <Globe size={20}/> {T[lang].leaderboardBtn}
+              </button>
+            </div>
           </div>
         )}
 
@@ -767,7 +794,44 @@ function App() {
               )}
             </div>
 
-            <button className="btn-primary" onClick={startGame}><RefreshCcw size={24}/> {T[lang].playAgain}</button>
+            <div style={{display: 'flex', gap: '10px', width: '100%', marginTop: '1rem'}}>
+              <button className="btn-primary" style={{flex: 1, padding: '10px'}} onClick={startGame}><RefreshCcw size={24}/> {T[lang].playAgain}</button>
+              <button className="btn-primary" style={{flex: 1, background: '#8b5cf6', borderBottomColor: '#6d28d9', padding: '10px'}} onClick={openLeaderboard}>
+                <Globe size={24}/> {T[lang].leaderboardBtn}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {gameState === 'leaderboard' && (
+          <div className="overlay-screen" style={{maxWidth: '500px'}}>
+            <h1 style={{marginBottom: '1.5rem'}}>{T[lang].leaderboardTitle}</h1>
+            
+            <div className="leaderboard-list" style={{width: '100%', maxHeight: '50vh', overflowY: 'auto', background: 'rgba(255,255,255,0.5)', borderRadius: '15px', padding: '1rem', marginBottom: '1.5rem'}}>
+              {isLoadingLeaderboard ? (
+                <div style={{textAlign: 'center', padding: '2rem', color: '#475569', fontWeight: 'bold'}}>{T[lang].loading}</div>
+              ) : leaderboardData.length === 0 ? (
+                <div style={{textAlign: 'center', padding: '2rem', color: '#475569', fontWeight: 'bold'}}>{T[lang].noScores}</div>
+              ) : (
+                leaderboardData.map((entry, index) => (
+                  <div key={entry.id || index} style={{
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    padding: '10px', 
+                    borderBottom: index < leaderboardData.length - 1 ? '2px solid rgba(255,255,255,0.5)' : 'none',
+                    fontWeight: 'bold',
+                    color: index === 0 ? '#ea580c' : index === 1 ? '#64748b' : index === 2 ? '#b45309' : '#1e293b'
+                  }}>
+                    <span>{index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`} {entry.name}</span>
+                    <span>{entry.score}</span>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <button className="btn-primary" onClick={() => setGameState('start')}>
+              <Home size={24}/> {T[lang].backBtn}
+            </button>
           </div>
         )}
       </div>
