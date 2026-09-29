@@ -1,16 +1,65 @@
-# React + Vite
+# 🌱 Eco-Sorter
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+![Eco-Sorter Hero](https://img.shields.io/badge/Status-Published-success?style=for-the-badge)
+![Platform](https://img.shields.io/badge/Platform-Android_&_Web-blue?style=for-the-badge&logo=android)
+![Tech Stack](https://img.shields.io/badge/Tech-React_%7C_Vite_%7C_Capacitor-20232A?style=for-the-badge&logo=react)
 
-Currently, two official plugins are available:
+**Eco-Sorter** is a beautifully designed, hyper-casual educational mobile game built to teach kids and families how to properly manage waste and save the planet.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Through fast-paced, satisfying gameplay, players must quickly sort over 100+ unique trash items into the correct bins before time runs out. The game dynamically teaches real-world environmental skills without feeling like a classroom.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✨ Key Features
 
-## Expanding the Oxlint configuration
+*   **🎮 Addicting Gameplay Loop:** Drag, drop, and build combos! Fast-paced sorting mechanics paired with deeply satisfying audio and visual feedback (confetti, screen shake, and bouncy physics).
+*   **🌍 Fully Bilingual (EN / FR):** The entire app, including UI and educational popups, can be instantly toggled between English and French.
+*   **🦸‍♂️ Hero Mode:** Break your High Score to activate "Super Earth Hero Mode", featuring dynamic background animations, pulsing lights, and a massive confetti celebration!
+*   **📚 Educational 'Eco-Facts':** When a player sorts an item incorrectly, the game pauses to deliver a beautifully formatted, bilingual fact explaining *why* the item belongs in a specific bin and *how* it impacts the Earth.
+*   **🧩 Smart Compound Items:** Some items (like a Coffee Cup) must be tapped to separate into recyclable and landfill parts before they can be sorted.
+*   **🎶 Relaxing Audio System:** Custom-synthesized, royalty-free, soft ambient background music combined with satisfying pop and buzzer sound effects.
+*   **🎚️ Adaptive Difficulty:** Easy, Normal, and Hard modes that dynamically adjust the clock and item spawn rates.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+---
+
+## 🛠️ Technology Stack
+
+*   **Frontend Framework:** React 18
+*   **Build Tool:** Vite
+*   **Mobile Compilation:** Ionic Capacitor (Android Native)
+*   **Animations:** Framer Motion & Canvas Confetti
+*   **Icons:** Lucide-React
+*   **Styling:** Custom Vanilla CSS with modern Glassmorphism & Micro-animations
+
+---
+
+## 🚀 Running Locally
+
+To run the game locally in your web browser:
+
+```bash
+# Install dependencies
+npm install
+
+# Start the Vite development server
+npm run dev
+```
+
+## 📱 Building for Android
+
+This project uses Capacitor to compile the React web app into a native Android `.aab` or `.apk` file.
+
+```bash
+# 1. Build the production web bundle
+npm run build
+
+# 2. Sync the web assets to the native Android project
+npx cap sync android
+
+# 3. Open Android Studio (Optional)
+npx cap open android
+```
+*(Note: Requires JDK 17 for compilation)*
+
+---
+*Created with love to protect our planet by The Eco Sorter Team! 🌍*
